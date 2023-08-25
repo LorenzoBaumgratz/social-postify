@@ -10,4 +10,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//FAZER MODELOS
+model Media{
+  id Int @id @default(autoincrement())
+  title String
+  username String
+}
+
+model Post{
+  id Int @id @default(autoincrement())
+  title String
+  username String
+  image String?
+}
+
+model Publication{
+  id Int @id @default(autoincrement())
+  mediaId Int 
+  postId Int
+  date DateTime
+}
