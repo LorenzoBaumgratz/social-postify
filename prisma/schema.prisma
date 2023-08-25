@@ -19,7 +19,7 @@ model Media{
 model Post{
   id Int @id @default(autoincrement())
   title String
-  username String
+  text String
   image String?
 }
 
