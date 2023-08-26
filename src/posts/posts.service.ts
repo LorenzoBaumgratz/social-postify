@@ -1,30 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsRepository } from './posts.repository';
+import { PublicationsRepository } from '../publications/publications.repository';
 
 @Injectable()
 export class PostsService {
 
-  constructor (private readonly repository:PostsRepository){}
+  constructor (
+    @Inject(forwardRef(()=> PublicationsRepository))
+    private readonly publicationsRepository:PublicationsRepository,
+    private readonly repository:PostsRepository
+    ){}
 
-  create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post';
+  async create(createPostDto: CreatePostDto) {
+    return await this.repository.createPost(createPostDto);
   }
 
-  findAll() {
-    return `This action returns all posts`;
+  async findAll() {
+    return await this.repository.findPosts();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
+  async findOne(id: number) {
+    const post=await this.repository.findPostById(id);
+    if(!post) throw new NotFoundException()
+    return post
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  async update(id: number, updatePostDto: CreatePostDto) {
+    const post=await this.repository.findPostById(id);
+    if(!post) throw new NotFoundException()
+    return await this.repository.updatePost(id,updatePostDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async remove(id: number) {
+    const post=await this.repository.findPostById(id);
+    if(!post) throw new NotFoundException()
+
+    //FAZ PARTE DE ALGUMA PUBLICAÇÃO??????? --->403
+    const publication=await this.publicationsRepository.findByMediaId(id)
+    if(publication) throw new ForbiddenException()
+    return await this.repository.removePost(id);
   }
 }

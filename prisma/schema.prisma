@@ -14,6 +14,7 @@ model Media{
   id Int @id @default(autoincrement())
   title String
   username String
+  Publication Publication[]
 }
 
 model Post{
@@ -21,11 +22,14 @@ model Post{
   title String
   text String
   image String?
+  Publication Publication[]
 }
 
 model Publication{
   id Int @id @default(autoincrement())
   mediaId Int 
+  Media Media @relation(fields: [mediaId],references: [id])
   postId Int
+  Post Post @relation(fields: [postId],references: [id])
   date DateTime
 }
